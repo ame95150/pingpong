@@ -70,7 +70,12 @@ In the initial release, Earthly is used for this project, but a docker compose d
 
 1. Earthly deployment (draft)
 
-   TO DO
+The Earthfile is composed of :
+- openjdk:11-ea-jdk-slim container as base, /aeron as work directory and the aeron-all-1.42.1.jar copied in /aeron
+- ping process is run inside the buil kit container (base)
+- pong process is run inside a dind Earhtly container earthly/dind:latest (+openjdk11, +aeron-all-1.42.1.jar)
+
+**This section is currently under development.**
 
 2. Docker compose deployment
 

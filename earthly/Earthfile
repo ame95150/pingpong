@@ -15,11 +15,13 @@ ping:
                -Daeron.sample.embeddedMediaDriver=true \
                -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
                -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
-               io.aeron.samples.Ping >/aeron/ping.log"
+               io.aeron.samples.Ping"
 
 pong:
     FROM earthly/dind:latest
     RUN apk add openjdk11
+    WORKDIR /aeron
+    COPY volumes/aeron-all-1.42.1.jar .
     WITH DOCKER
             RUN sh -c "java -cp /aeron/aeron-all-1.42.1.jar \
               -XX:+UnlockDiagnosticVMOptions \
@@ -28,7 +30,7 @@ pong:
               -Daeron.sample.embeddedMediaDriver=true \
               -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
               -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
-              io.aeron.samples.Pong >/aeron/pong.log"
+              io.aeron.samples.Pong"
     END
     
 all:
