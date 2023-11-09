@@ -1,0 +1,36 @@
+VERSION 0.7
+
+FROM openjdk:11-ea-jdk-slim
+
+WORKDIR /aeron
+
+COPY volumes/aeron-all-1.42.1.jar .
+
+ping:
+    FROM +base
+    RUN bash -c "java -cp /aeron/aeron-all-1.42.1.jar \
+               -XX:+UnlockDiagnosticVMOptions \
+               -XX:GuaranteedSafepointInterval=300000 \
+               -Dagrona.disable.bounds.checks=true \
+               -Daeron.sample.embeddedMediaDriver=true \
+               -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
+               -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
+               io.aeron.samples.Ping >/aeron/ping.log"
+
+pong:
+    FROM earthly/dind:latest
+    RUN apk add openjdk11
+    WITH DOCKER
+            RUN sh -c "java -cp /aeron/aeron-all-1.42.1.jar \
+              -XX:+UnlockDiagnosticVMOptions \
+              -XX:GuaranteedSafepointInterval=300000 \
+              -Dagrona.disable.bounds.checks=true \
+              -Daeron.sample.embeddedMediaDriver=true \
+              -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
+              -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
+              io.aeron.samples.Pong >/aeron/pong.log"
+    END
+    
+all:
+    BUILD +ping 
+    BUILD +pong

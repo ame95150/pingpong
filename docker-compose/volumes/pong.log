@@ -1,0 +1,3 @@
+Subscribing Ping at aeron:udp?endpoint=pong:40124 on stream id 1002
+Publishing Pong at aeron:udp?endpoint=ping:40123 on stream id 1003
+Using exclusive publications false

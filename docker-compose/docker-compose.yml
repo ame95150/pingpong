@@ -1,0 +1,40 @@
+version: '3'
+services:
+  ping:
+    image: openjdk:11-ea-jdk-slim
+    container_name: ping
+    command: >
+      bash -c "java -cp /aeron/aeron-all-1.42.1.jar \
+               -XX:+UnlockDiagnosticVMOptions \
+               -XX:GuaranteedSafepointInterval=300000 \
+               -Dagrona.disable.bounds.checks=true \
+               -Daeron.sample.embeddedMediaDriver=true \
+               -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
+               -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
+               io.aeron.samples.Ping >/aeron/ping.log"
+    volumes:
+    - ./volumes:/aeron
+    shm_size: 512M
+    networks: 
+      - pingpong
+
+  pong:
+    image: openjdk:11-ea-jdk-slim
+    container_name: pong
+    command: >
+      bash -c "java -cp /aeron/aeron-all-1.42.1.jar \
+              -XX:+UnlockDiagnosticVMOptions \
+              -XX:GuaranteedSafepointInterval=300000 \
+              -Dagrona.disable.bounds.checks=true \
+              -Daeron.sample.embeddedMediaDriver=true \
+              -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
+              -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
+              io.aeron.samples.Pong >/aeron/pong.log"
+    volumes:
+    - ./volumes:/aeron
+    shm_size: 512M
+    networks: 
+      - pingpong
+
+networks:
+ pingpong:
