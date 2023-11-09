@@ -1,4 +1,4 @@
-# pingpong : # Ping Pong Aeron with Earthly and Docker
+# pingpong : Ping Pong Aeron with Earthly and Docker
 
 The purpose of this project is to set up an Aeron Ping Pong project with Earthly and Docker, by performing a ping pong between two applications under Ubuntu server.
 
@@ -66,7 +66,7 @@ Aeron all in one Jar can be downloaded, and can also be builded with gradle.
 ## Deployement 
 In the initial release, Earthly is used for this project, but a docker compose deployment is implememented to facilitate the handling of the Ping and Pong features of the Aeron project.
 
-1. Earthly deployment (draft)
+### Earthly deployment (draft)
 
 The Earthfile is composed of :
 - openjdk:11-ea-jdk-slim container as base, /aeron as work directory and the aeron-all-1.42.1.jar copied in /aeron
@@ -75,7 +75,7 @@ The Earthfile is composed of :
 
 **This section is currently under development.**
 
-2. Docker compose deployment
+### Docker compose deployment
 
 The stack is in [the docker-compose directory](docker-compose) at the root of the the git project.
 The [docker-compose.yml](docker-compose/docker-compose.yml) is composed of 2 services and one network : 
