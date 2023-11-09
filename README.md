@@ -6,10 +6,8 @@ The purpose of this project is to set up an Aeron Ping Pong project with Earthly
 
 - [Configuration](#Configuration)
 - [Prerequisites](#Prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+- [Deployement](#Deployement)
+
 
 ## Configuration
 
