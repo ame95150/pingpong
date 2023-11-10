@@ -13,8 +13,8 @@ ping:
                -XX:GuaranteedSafepointInterval=300000 \
                -Dagrona.disable.bounds.checks=true \
                -Daeron.sample.embeddedMediaDriver=true \
-               -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
-               -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
+               -Daeron.sample.ping.channel=aeron:udp?endpoint=localhost:40124 \
+               -Daeron.sample.pong.channel=aeron:udp?endpoint=localhost:40123 \
                io.aeron.samples.Ping"
 
 pong:
@@ -28,8 +28,8 @@ pong:
               -XX:GuaranteedSafepointInterval=300000 \
               -Dagrona.disable.bounds.checks=true \
               -Daeron.sample.embeddedMediaDriver=true \
-              -Daeron.sample.ping.channel=aeron:udp?endpoint=pong:40124 \
-              -Daeron.sample.pong.channel=aeron:udp?endpoint=ping:40123 \
+              -Daeron.sample.ping.channel=aeron:udp?endpoint=localhost:40124 \
+              -Daeron.sample.pong.channel=aeron:udp?endpoint=localhost:40123 \
               io.aeron.samples.Pong"
     END
     
