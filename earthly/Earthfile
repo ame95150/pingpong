@@ -8,6 +8,7 @@ COPY volumes/aeron-all-1.42.1.jar .
 
 ping:
     FROM +base
+    EXPOSE 40123/udp
     RUN bash -c "java -cp /aeron/aeron-all-1.42.1.jar \
                -XX:+UnlockDiagnosticVMOptions \
                -XX:GuaranteedSafepointInterval=300000 \
@@ -15,24 +16,26 @@ ping:
                -Daeron.sample.embeddedMediaDriver=true \
                -Daeron.sample.ping.channel=aeron:udp?endpoint=localhost:40124 \
                -Daeron.sample.pong.channel=aeron:udp?endpoint=localhost:40123 \
-               io.aeron.samples.Ping"
+               io.aeron.samples.Ping >ping.log"
 
 pong:
-    FROM earthly/dind:latest
-    RUN apk add openjdk11
+    FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
+    EXPOSE 40124/udp
     WORKDIR /aeron
     COPY volumes/aeron-all-1.42.1.jar .
-    WITH DOCKER
-            RUN sh -c "java -cp /aeron/aeron-all-1.42.1.jar \
-              -XX:+UnlockDiagnosticVMOptions \
-              -XX:GuaranteedSafepointInterval=300000 \
-              -Dagrona.disable.bounds.checks=true \
-              -Daeron.sample.embeddedMediaDriver=true \
-              -Daeron.sample.ping.channel=aeron:udp?endpoint=localhost:40124 \
-              -Daeron.sample.pong.channel=aeron:udp?endpoint=localhost:40123 \
-              io.aeron.samples.Pong"
+    COPY volumes/docker-compose.yml .
+    WITH DOCKER --compose docker-compose.yml
+        RUN pong=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pong) && \
+            docker-compose exec pong java -cp /aeron/aeron-all-1.42.1.jar \
+            -XX:+UnlockDiagnosticVMOptions \
+            -XX:GuaranteedSafepointInterval=300000 \
+            -Dagrona.disable.bounds.checks=true \
+            -Daeron.sample.embeddedMediaDriver=true \
+            -Daeron.sample.ping.channel=aeron:udp?endpoint=${pong}:40124 \
+            -Daeron.sample.pong.channel=aeron:udp?endpoint=localhost:40123 \
+            io.aeron.samples.Pong
     END
     
 all:
-    BUILD +ping 
-    BUILD +pong
+        BUILD +ping
+        BUILD +pong

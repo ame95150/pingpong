@@ -1,0 +1,11 @@
+version: '3'
+services:
+  pong:
+    image: openjdk:11.0.16
+    container_name: pong
+    command: tail -f /dev/null
+    ports:
+    - 40124:40124
+    volumes:
+    - /aeron:/aeron
+    shm_size: 512M
