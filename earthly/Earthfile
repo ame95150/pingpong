@@ -8,32 +8,32 @@ COPY volumes/aeron-all-1.42.1.jar .
 
 ping:
     FROM +base
-    EXPOSE 40123/udp
-    RUN bash -c "java -cp /aeron/aeron-all-1.42.1.jar \
+    RUN       bash -c "java -cp aeron-all-1.42.1.jar \
                -XX:+UnlockDiagnosticVMOptions \
                -XX:GuaranteedSafepointInterval=300000 \
                -Dagrona.disable.bounds.checks=true \
                -Daeron.sample.embeddedMediaDriver=true \
-               -Daeron.sample.ping.channel=aeron:udp?endpoint=localhost:40124 \
-               -Daeron.sample.pong.channel=aeron:udp?endpoint=localhost:40123 \
-               io.aeron.samples.Ping >ping.log"
+               -Daeron.sample.ping.channel=aeron:udp?endpoint=127.0.0.1:40124 \
+               -Daeron.sample.pong.channel=aeron:udp?endpoint=127.0.0.1:40123 \
+               io.aeron.samples.Ping > ping.log"
 
 pong:
     FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
-    EXPOSE 40124/udp
+    RUN apk add openjdk11
     WORKDIR /aeron
     COPY volumes/aeron-all-1.42.1.jar .
     COPY volumes/docker-compose.yml .
+    RUN echo "docker0=$(ip addr show docker0 | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)" > /aeron/.env
     WITH DOCKER --compose docker-compose.yml
-        RUN pong=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pong) && \
-            docker-compose exec pong java -cp /aeron/aeron-all-1.42.1.jar \
+        #RUN export pong=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pong) && \
+        RUN docker-compose exec pong java -cp /aeron/aeron-all-1.42.1.jar \
             -XX:+UnlockDiagnosticVMOptions \
             -XX:GuaranteedSafepointInterval=300000 \
             -Dagrona.disable.bounds.checks=true \
             -Daeron.sample.embeddedMediaDriver=true \
-            -Daeron.sample.ping.channel=aeron:udp?endpoint=${pong}:40124 \
+            -Daeron.sample.ping.channel=aeron:udp?endpoint=localhost:40124 \
             -Daeron.sample.pong.channel=aeron:udp?endpoint=localhost:40123 \
-            io.aeron.samples.Pong
+            io.aeron.samples.Pong >pong.log
     END
     
 all:

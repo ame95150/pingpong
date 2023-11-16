@@ -4,8 +4,22 @@ services:
     image: openjdk:11.0.16
     container_name: pong
     command: tail -f /dev/null
+    # command: >
+    #   bash -c "java -cp /aeron/aeron-all-1.42.1.jar \
+    #           -XX:+UnlockDiagnosticVMOptions \
+    #           -XX:GuaranteedSafepointInterval=300000 \
+    #           -Dagrona.disable.bounds.checks=true \
+    #           -Daeron.sample.embeddedMediaDriver=true \
+    #           -Daeron.sample.ping.channel=aeron:udp?endpoint=127.0.0.1:40124 \
+    #           -Daeron.sample.pong.channel=aeron:udp?endpoint=127.0.0.1:40123 \
+    #           io.aeron.samples.Pong > pong.log"
     ports:
-    - 40124:40124
+    - 40124:40124/udp
     volumes:
     - /aeron:/aeron
     shm_size: 512M
+    networks:
+      - pong
+networks:
+  pong:
+    driver: bridge
